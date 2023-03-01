@@ -34,15 +34,14 @@ const setAlert = (msg, color = "green") => {
 };
 
 const setLoadingMsg = (msg) => {
-  const loading = getGlobalState("loading");
-  setGlobalState("loading", { ...loading, msg });
+  setGlobalState("loading", { show: true, msg });
 };
 
 const truncate = (text, startChars, endChars, maxLength) => {
-  if (text.lenght > maxLength) {
+  if (text.length > maxLength) {
     var start = text.substring(0, startChars);
-    var end = text.substring(text.lenght - endChars, text.length);
-    while (start.lenght + end.lenght < maxLength) {
+    var end = text.substring(text.length - endChars, text.length);
+    while (start.length + end.length < maxLength) {
       start = start + ".";
     }
     return start + end;

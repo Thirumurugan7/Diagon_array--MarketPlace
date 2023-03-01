@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { isWalletConnected } from "./Blockchain.services";
 import Alert from "./components/Alert";
 import Artworks from "./components/Artworks";
 import CreateNFT from "./components/CreateNFT";
@@ -9,6 +11,11 @@ import ShowNFT from "./components/ShowNFT";
 import Transaction from "./components/Transaction";
 import UpdateNFT from "./components/UpdateNFT";
 const App = () => {
+  //for maintaining wallet connect globally
+  useEffect(async () => {
+    await isWalletConnected();
+  }, []);
+
   return (
     <div className="min-h-screen">
       <div className="gradient-bg-hero">

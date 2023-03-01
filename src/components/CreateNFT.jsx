@@ -3,7 +3,47 @@ const imgAddress =
   "https://images.cointelegraph.com/images/1434_aHR0cHM6Ly9zMy5jb2ludGVsZWdyYXBoLmNvbS91cGxvYWRzLzIwMjEtMDYvNGE4NmNmOWQtODM2Mi00YmVhLThiMzctZDEyODAxNjUxZTE1LmpwZWc=.jpg";
 
 import { FaTimes } from "react-icons/fa";
-import { setGlobalState, useGlobalState } from "../store";
+import { create } from "ipfs-http-client";
+
+const auth =
+  "Basic " +
+  Buffer.from(
+    "12D3KooWLiWQXepzDEqffKYLhMZ9mCubRtpxEhJmRKaT7zSo7Wzd" +
+      ":" +
+      "/ip4/127.0.0.1/tcp/5001"
+  ).toString("base64");
+
+const client = create({
+  host: "webui.ipfs.io.ipns.localhost:8080",
+  port: "5001",
+  protocol: "https",
+  headers: {
+    authorization: auth,
+  },
+});
+
+// const auth =
+//   "Basic " +
+//   Buffer.from(
+//     "2Gg95YqQ672apEtGQbewfwGQANc" + ":" + "b2c85789868e83772bfbc59ddd6d09bb"
+//   ).toString("base64");
+
+// const client = create({
+//   host: "ipfs.infura.io",
+//   port: 5001,
+//   protocol: "https",
+//   headers: {
+//     authorization: auth,
+//   },
+// });
+import {
+  setAlert,
+  setGlobalState,
+  setLoadingMsg,
+  useGlobalState,
+} from "../store";
+
+import { mintNFT } from ".././Blockchain.services";
 const CreateNFT = () => {
   const [modal] = useGlobalState("modal");
   const [title, setTitle] = useState("");
@@ -16,12 +56,39 @@ const CreateNFT = () => {
 
   const [imgBase64, setImgBase64] = useState(null);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!title || !description || !price) return;
-    console.log("minted");
-    closeModal();
+    setGlobalState("modal", "scale-0");
+    setLoadingMsg("Uploaded, approve transaction now ");
+    try {
+      const created = await client.add(fileUrl);
+      setLoadingMsg("Uploading to IPFS.....");
+
+      const metadataURI = "https://ipfs.io/ipfs/${created.path}";
+      const nft = { title, description, price, metadataURI };
+
+      await mintNFT(nft);
+      closeModal();
+
+      setAlert("Minting Completed");
+    } catch (error) {
+      console.log("error uploading files", error);
+      setAlert("Minting failed", "red");
+    }
+  };
+
+  const changeImage = async (e) => {
+    const reader = new FileReader();
+
+    if (e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
+
+    reader.onload = (readerEvent) => {
+      const file = readerEvent.target.result;
+      setImgBase64(file);
+      setFileUrl(e.target.files[0]);
+    };
   };
 
   const closeModal = () => {
@@ -70,6 +137,7 @@ const CreateNFT = () => {
                 type="file"
                 className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:text-sm file:font-semibold focus:outline-none hover:file:bg-[#1d2631] file:border-0 cursor-pointer focus:ring-0"
                 accept="image/png, image/gif, image/jpeg, image/jpg, image/webp"
+                onChange={changeImage}
                 required
               />
             </label>
