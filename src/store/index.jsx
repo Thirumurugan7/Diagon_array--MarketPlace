@@ -13,6 +13,12 @@ const { setGlobalState, useGlobalState, getGlobalState } = createGlobalState({
     msg: "",
     color: "",
   },
+
+  connectedAccount: "",
+  nft: null,
+  nfts: [],
+  transactions: [],
+  contract: null,
 });
 
 //scale-0 is a tailwind class which makes things disappear
@@ -32,4 +38,23 @@ const setLoadingMsg = (msg) => {
   setGlobalState("loading", { ...loading, msg });
 };
 
-export { useGlobalState, setGlobalState, getGlobalState, setLoadingMsg };
+const truncate = (text, startChars, endChars, maxLength) => {
+  if (text.lenght > maxLength) {
+    var start = text.substring(0, startChars);
+    var end = text.substring(text.lenght - endChars, text.length);
+    while (start.lenght + end.lenght < maxLength) {
+      start = start + ".";
+    }
+    return start + end;
+  }
+  return text;
+};
+
+export {
+  useGlobalState,
+  setGlobalState,
+  getGlobalState,
+  setLoadingMsg,
+  setAlert,
+  truncate,
+};
