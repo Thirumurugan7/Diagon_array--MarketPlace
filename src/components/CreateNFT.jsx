@@ -8,13 +8,11 @@ import { create } from "ipfs-http-client";
 const auth =
   "Basic " +
   Buffer.from(
-    "12D3KooWLiWQXepzDEqffKYLhMZ9mCubRtpxEhJmRKaT7zSo7Wzd" +
-      ":" +
-      "/ip4/127.0.0.1/tcp/5001"
+    "2Mx9vO2qo62VJsLcmFJKYSi6cZv" + ":" + "7e144896e30b0fb53891f0990949172b"
   ).toString("base64");
 
 const client = create({
-  host: "webui.ipfs.io.ipns.localhost:8080",
+  host: "ipfs.infura.io",
   port: "5001",
   protocol: "https",
   headers: {
@@ -61,6 +59,10 @@ const CreateNFT = () => {
 
     if (!title || !description || !price) return;
     setGlobalState("modal", "scale-0");
+    setGlobalState("loading", {
+      show: true,
+      msg: "Uploading to IPFS.....",
+    });
     setLoadingMsg("Uploaded, approve transaction now ");
     try {
       const created = await client.add(fileUrl);
